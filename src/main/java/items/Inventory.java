@@ -2,7 +2,6 @@ package items;
 
 import java.util.List;
 import java.util.ArrayList;
-
 import java.util.Iterator;
 import java.util.Objects;
 
@@ -14,8 +13,7 @@ import java.util.Objects;
  * stored. Individual slots may contain any number of the same
  * Item--if the Item is stackable.
  */
-public class Inventory implements Iterable<ItemStack>, Cloneable
-{
+public class Inventory implements Iterable<ItemStack>, Cloneable {
     /**
      * This is the Default Inventory size.
      */
@@ -28,7 +26,7 @@ public class Inventory implements Iterable<ItemStack>, Cloneable
      * @param lhs stack whose size will be increased
      * @param rhs stack whose size we need to examine
      */
-    public static void mergeStacks(ItemStack lhs, ItemStack rhs) //done
+    public static void mergeStacks(ItemStack lhs, ItemStack rhs) // done
     {
         lhs.addItems(rhs.size());
     }
@@ -37,7 +35,6 @@ public class Inventory implements Iterable<ItemStack>, Cloneable
      * Individual item slots--each ItemStack occupies one slot.
      */
     private List<ItemStack> slots;
-
     /**
      * Total number of distinct Item types that can be stored.
      */
@@ -46,8 +43,7 @@ public class Inventory implements Iterable<ItemStack>, Cloneable
     /**
      * Default to an inventory with 10 slots.
      */
-    public Inventory()
-    {
+    public Inventory() {
         this(DEFAULT_SIZE);
     }
 
@@ -56,25 +52,22 @@ public class Inventory implements Iterable<ItemStack>, Cloneable
      *
      * @param desiredCapacity size of the new Inventory
      */
-    public Inventory(int desiredCapacity)
-    {
-        this.slots    = new ArrayList<>();
+    public Inventory(int desiredCapacity) {
+        this.slots = new ArrayList<>();
         this.capacity = desiredCapacity;
     }
 
     /**
      * Determine the number of slots currently in use.
      */
-    public int utilizedSlots()
-    {
+    public int utilizedSlots() {
         return this.slots.size();
     }
 
     /**
      * Determine the number of empty (unused) slots.
      */
-    public int emptySlots()
-    {
+    public int emptySlots() {
         return this.totalSlots() - this.utilizedSlots();
     }
 
@@ -82,8 +75,7 @@ public class Inventory implements Iterable<ItemStack>, Cloneable
      * Retrieve the capacity (number of distinct types of items) that this
      * inventory can store.
      */
-    public int totalSlots()
-    {
+    public int totalSlots() {
         return this.capacity;
     }
 
@@ -92,19 +84,17 @@ public class Inventory implements Iterable<ItemStack>, Cloneable
      *
      * @return true if the current size is equal to capacity
      */
-    public boolean isFull() //done
+    public boolean isFull() // done
     {
         Iterator<ItemStack> it = this.slots.iterator();
         int size = 0;
-
-        while(it.hasNext()){
-            if (size == capacity){
-                return true;
-            }
+        while (it.hasNext()) {
             it.next();
             size++;
         }
-
+        if (size == capacity) {
+            return true;
+        }
         return false;
     }
 
@@ -113,8 +103,7 @@ public class Inventory implements Iterable<ItemStack>, Cloneable
      *
      * @return true if current size is zero
      */
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
         return this.slots.size() == 0;
     }
 
@@ -126,19 +115,15 @@ public class Inventory implements Iterable<ItemStack>, Cloneable
      *
      * @return matching stack if one was found and `null` otherwise
      */
-    public ItemStack findMatchingItemStack(ItemStack key) //done
+    public ItemStack findMatchingItemStack(ItemStack key) // done
     {
         Iterator<ItemStack> it = this.slots.iterator();
-
         ItemStack item;
-
-        while(it.hasNext()){
-            
-            if(item = it.next().equals(key)){
+        while (it.hasNext()) {
+            if ((item = it.next()).equals(key)) {
                 return item;
             }
         }
-
         return null;
     }
 
@@ -147,7 +132,7 @@ public class Inventory implements Iterable<ItemStack>, Cloneable
      *
      * @param toAdd data that we want to store in a Node and add to the list
      */
-    public void addItemStackNoCheck(ItemStack toAdd) //done
+    public void addItemStackNoCheck(ItemStack toAdd) // done
     {
         this.slots.add(toAdd);
     }
@@ -159,68 +144,55 @@ public class Inventory implements Iterable<ItemStack>, Cloneable
      *
      * @return true if *stack* was added and false otherwise
      */
-    public boolean addItems(ItemStack stack)
-    {
+    public boolean addItems(ItemStack stack) {
         ItemStack match = this.findMatchingItemStack(stack);
-
         // if a match was found
         if (match != null) {
             // If the Item is stackable, add it to the ItemStack
             if (match.permitsStacking()) {
                 mergeStacks(match, stack);
-
                 return true;
             }
         }
-
         if (this.slots.size() < capacity) {
             this.addItemStackNoCheck(stack);
             return true;
         }
-
         return false;
     }
 
     @Override
-    public Inventory clone() //done
+    public Inventory clone() // done
     {
         Inventory copy = new Inventory(this.totalSlots());
-
         Iterator<ItemStack> it = this.slots.iterator();
-
-        while(it.hasNext()){
+        while (it.hasNext()) {
             copy.addItems(it.next());
         }
-
         return copy;
     }
 
     /**
-     * Two Invetories are considered equal if they:
+     * Two Inventories are considered equal if they:
      *
-     *   1. Have the same capacity
-     *   2. Have the same ItemStacks in the same order
+     * 1. Have the same capacity
+     * 2. Have the same ItemStacks in the same order
      */
     @Override
-    public boolean equals(Object obj)
-    {
+    public boolean equals(Object obj) {
         if (!(obj instanceof Inventory)) {
             return false;
         }
-
         Inventory lhs = this;
         Inventory rhs = (Inventory) obj;
-
         if (lhs.totalSlots() != rhs.totalSlots()) {
             return false;
         }
-
         return lhs.slots.equals(rhs.slots);
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(this.capacity, this.slots);
     }
 
@@ -228,28 +200,29 @@ public class Inventory implements Iterable<ItemStack>, Cloneable
      * *Print* a Summary of the Inventory and all Items contained within.
      */
     @Override
-    public String toString() //done?
+    public String toString() // done?
     {
         String summaryLine = String.format(
-            " -Used %d of %d slots%n", this.utilizedSlots(), this.totalSlots()
-        );
-
+                " -Used %d of %d slots%n", this.utilizedSlots(), this.totalSlots());
         StringBuilder strBld = new StringBuilder();
         strBld.append(summaryLine);
-
+        //new code below:
         Iterator<ItemStack> it = this.slots.iterator();
-
-        while(it.hasNext()){
+        while (it.hasNext()) {
             ItemStack stack = it.next();
-            String app = "(" + stack.size() +") " + stack.getItem().getname() ;
+            String app;
+            if (stack.size() < 10) {
+                app = "  ( " + stack.size() + ") " + stack.getItem().getName();
+            } else {
+                app = "  (" + stack.size() + ") " + stack.getItem().getName();
+            }
+            strBld.append(app);
         }
-
         return strBld.toString();
     }
 
     @Override
-    public Iterator<ItemStack> iterator()
-    {
+    public Iterator<ItemStack> iterator() {
         return this.slots.iterator();
     }
 }
